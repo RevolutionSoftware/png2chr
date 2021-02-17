@@ -3,23 +3,27 @@
 BIN=png2nes
 SOURCE=png2nes.c
 BINDBG=${BIN}dbg
+CFLAGS="-std=c89 -Wall -Wno-unknown-pragmas"
+LDFLAGS="-L/usr/local/lib -lpng"
+DEBUG_FLAGS="${CFLAGS} -DDEBUG -Wpedantic -Wshadow -Wextra -Werror=implicit-int -Werror=incompatible-pointer-types -Werror=int-conversion -Wvla -g -Og -fsanitize=address -fsanitize=undefined"
+RELEASE_FLAGS="${CFLAGS} -Os -DNDEBUG -g0 -s"
 
 # Debug (slow)
 build_debug()
 {
-    cc -std=c89 -DDEBUG -Wall -Wno-unknown-pragmas -Wpedantic -Wshadow -Wextra -Werror=implicit-int -Werror=incompatible-pointer-types -Werror=int-conversion -Wvla -g -Og -fsanitize=address -fsanitize=undefined $SOURCE -L/usr/local/lib -lpng -o $BINDBG
+    cc $SOURCE $DEBUG_FLAGS $LDFLAGS -o $BINDBG
 }
 
 # Build (fast)
 build_release()
 {
-    cc $SOURCE -std=c89 -Os -DNDEBUG -g0 -s -Wall -Wno-unknown-pragmas -L/usr/local/lib -lpng -o $BIN
+    cc $SOURCE $RELEASE_FLAGS $LDFLAGS -o $BIN
 }
 
 # Build Debug but pipe binary into /dev/null
 build_test()
 {
-    cc -std=c89 -DDEBUG -Wall -Wno-unknown-pragmas -Wpedantic -Wshadow -Wextra -Werror=implicit-int -Werror=incompatible-pointer-types -Werror=int-conversion -Wvla -g -Og -fsanitize=address -fsanitize=undefined $SOURCE -L/usr/local/lib -lpng -c -o /dev/null
+    cc $SOURCE $DEBUG_FLAGS $LDFLAGS -o /dev/null
 }
 
 cleanup()
@@ -45,7 +49,7 @@ case "$1" in
     f)
 	code_format
 	;;
-    br|rb)
+    dr|rd)
 	build_release
 	build_debug
 	;;
