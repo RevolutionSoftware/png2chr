@@ -120,7 +120,7 @@ main(int argc, char *argv[])
 	FILE *output;
 
 	char filename[256];
-	Uint8 namelength = strlen(argv[1]);
+	Uint8 namelength;
 
 	int p_png; /* Predicate PNG - Is it a PNG file? */
 	Uint32 rowbytes;
@@ -129,6 +129,8 @@ main(int argc, char *argv[])
 		printf("Usage: %s input.png [output.chr]\n", argv[0]);
 		return 0;
 	}
+
+	namelength = strlen(argv[1]);
 
 	/* Open .png file for reading */
 	fp = fopen(argv[1], "r");
