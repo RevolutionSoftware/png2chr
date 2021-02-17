@@ -23,9 +23,9 @@ typedef struct {
 	Uint8 type;
 	Uint8 depth;
 	Uint8 **rows;
-} PNG_d;
+} PNG_Doc;
 
-PNG_d inf; /* INputFile */
+PNG_Doc inf; /* INputFile */
 
 int
 error(char *msg, char *err)
@@ -35,7 +35,7 @@ error(char *msg, char *err)
 }
 
 void
-setuppng(FILE *fp, PNG_d *iput)
+setuppng(FILE *fp, PNG_Doc *iput)
 {
 	png_init_io(iput->imgptr, fp);
 	png_set_sig_bytes(iput->imgptr, HLEN);
@@ -49,13 +49,12 @@ setuppng(FILE *fp, PNG_d *iput)
 }
 
 void
-exportsprite(FILE *chrfile, Uint8 **rows, Uint8 *buf1, Uint8 *buf2, Uint8 col, Uint8 row)
+exportsprite(FILE *chrfile, Uint8 **rows, Uint8 col, Uint8 row)
 {
-	Uint32 y;
-	Uint32 x;
-	Uint8 pixel;
-	Uint8 bit0;
-	Uint8 bit1;
+	Uint32 y, x;
+	Uint8 buf1[8];
+	Uint8 buf2[8];
+	Uint8 pixel, bit0, bit1;
 	for(y = 0; y < 8; y++) {
 		/* Clear the current byte in the buffer */
 		buf1[y] = 0;
@@ -86,24 +85,21 @@ exportsprite(FILE *chrfile, Uint8 **rows, Uint8 *buf1, Uint8 *buf2, Uint8 col, U
 }
 
 void
-putdata(PNG_d *iput, FILE *chrfile)
+putdata(PNG_Doc *iput, FILE *chrfile)
 {
-	Uint32 x;
-	Uint32 y;
-	Uint8 buf1[8];
-	Uint8 buf2[8];
+	Uint32 y, x;
 	Uint8 spriteno = 0;
 
 	for(y = 0; y < iput->imgh / 8; y++) {
 		for(x = 0; x < iput->imgw / 8; x++) {
 			printf("Writing sprite #%d\n", ++spriteno);
-			exportsprite(chrfile, iput->rows, buf1, buf2, x * 8, y * 8);
+			exportsprite(chrfile, iput->rows, x * 8, y * 8);
 		}
 	}
 }
 
 void
-close_me(FILE *fp, FILE *output, PNG_d *iput)
+close(FILE *fp, FILE *output, PNG_Doc *iput)
 {
 	fclose(fp);
 	fclose(output);
@@ -111,10 +107,15 @@ close_me(FILE *fp, FILE *output, PNG_d *iput)
 	png_destroy_read_struct(&iput->imgptr, NULL, NULL);
 }
 
+void
+usage()
+{
+}
+
 int
 main(int argc, char *argv[])
 {
-	PNG_d *input = &inf;
+	PNG_Doc *input = &inf;
 
 	FILE *fp;
 	FILE *output;
@@ -127,6 +128,8 @@ main(int argc, char *argv[])
 
 	if(argc < 2) {
 		printf("Usage: %s input.png [output.chr]\n", argv[0]);
+		printf("Currently having a [output.chr] argument isn't supported.\n");
+
 		return 0;
 	}
 
@@ -183,7 +186,7 @@ main(int argc, char *argv[])
 	output = fopen(filename, "w");
 
 	putdata(input, output);
-	close_me(fp, output, input);
+	close(fp, output, input);
 
 	return 0;
 }
