@@ -108,8 +108,11 @@ close(FILE *fp, FILE *output, PNG_Doc *iput)
 }
 
 void
-usage()
+usage(char *argv[])
 {
+	printf("Usage: %s input.png [output.chr]\n", argv[0]);
+	printf("If missing optional [output.chr] param is entered ");
+	printf("input name will be used as it's base.\n");
 }
 
 int
@@ -120,20 +123,17 @@ main(int argc, char *argv[])
 	FILE *fp;
 	FILE *output;
 
-	char filename[256];
+	char outputname[256];
+	char *outputptr;
 	Uint8 namelength;
 
 	int p_png; /* Predicate PNG - Is it a PNG file? */
 	Uint32 rowbytes;
 
 	if(argc < 2) {
-		printf("Usage: %s input.png [output.chr]\n", argv[0]);
-		printf("Currently having a [output.chr] argument isn't supported.\n");
-
+		usage(argv);
 		return 0;
 	}
-
-	namelength = strlen(argv[1]);
 
 	/* Open .png file for reading */
 	fp = fopen(argv[1], "r");
@@ -178,12 +178,19 @@ main(int argc, char *argv[])
 	if(rowbytes != input->imgw)
 		return error("Packing", "Failure. imgw != rowbytes");
 
+	namelength = strlen(argv[1]);
+
 	/* Open .chr file for writing */
-	strcpy(filename, argv[1]);
-	filename[namelength - 1] = 'r';
-	filename[namelength - 2] = 'h';
-	filename[namelength - 3] = 'c';
-	output = fopen(filename, "w");
+	strcpy(outputname, argv[1]);
+	/* WARNING: If namelength < 3, this will segfault the program. */
+	outputname[namelength - 1] = 'r';
+	outputname[namelength - 2] = 'h';
+	outputname[namelength - 3] = 'c';
+
+	/* If a second parameter is entered: use that as output filename. */
+	outputptr = argc > 2 ? argv[2] : outputname;
+
+	output = fopen(outputptr, "w");
 
 	putdata(input, output);
 	close(fp, output, input);
