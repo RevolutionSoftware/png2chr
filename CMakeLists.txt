@@ -8,9 +8,9 @@ if (NOT PKG_CONFIG_FOUND)
 endif ()
 
 # check for libpng
-pkg_check_modules (LIBPNG libpng12 REQUIRED)
+pkg_check_modules (LIBPNG libpng REQUIRED)
 if (NOT LIBPNG_FOUND)
-    message(FATAL_ERROR "You don't seem to have libpng12 development libraries installed")
+    message(FATAL_ERROR "You don't seem to have libpng development libraries installed")
 else ()
     include_directories (${LIBPNG_INCLUDE_DIRS})
     link_directories (${LIBPNG_LIBRARY_DIRS})
