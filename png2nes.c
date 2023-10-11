@@ -208,7 +208,7 @@ main(int argc, char *argv[])
 	}
 
 	/* Open .png file for reading */
-	fp = fopen(argv[1], "r");
+	fp = fopen(argv[1], "rb");
 	if(!fp)
 		return error("bad input", "checkpng - !fp");
 
@@ -303,7 +303,7 @@ main(int argc, char *argv[])
 	/* If a second parameter is entered: use that as output filename. */
 	outputptr = argc > 2 ? argv[2] : outputname;
 
-	output = fopen(outputptr, "w");
+	output = fopen(outputptr, "wb");
 
 	putdata(input, output, type);
 	close(fp, output, input);
