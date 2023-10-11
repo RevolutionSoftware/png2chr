@@ -196,7 +196,6 @@ main(int argc, char *argv[])
 	FILE *fp;
 	FILE *output;
 
-	char outputname[256];
 	char *outputptr;
 	Uint8 namelength;
 
@@ -285,13 +284,21 @@ main(int argc, char *argv[])
 		return error("Packing", "Failure. imgw != rowbytes");
 
 	namelength = strlen(argv[1]);
+	
+	size_t outnamelength = namelength + 4 + 1; //enough to add a .png at the end of the name
+	char outputname[outnamelength];
 
 	/* Open .chr file for writing */
 	strcpy(outputname, argv[1]);
+
+	char* last_dot = strrchr(outputname,'.'); //find the file's extension by looking 
+	if (!last_dot) last_dot = outputname + strlen(outputname); //if there's none, we'll add one
 	/* WARNING: If namelength < 3, this will segfault the program. */
-	outputname[namelength - 1] = 'r';
-	outputname[namelength - 2] = 'h';
-	outputname[namelength - 3] = 'c';
+	last_dot[0] = '.';
+	last_dot[1] = 'c';
+	last_dot[2] = 'h';
+	last_dot[3] = 'r';
+	last_dot[4] = 0;
 
 	/* If a second parameter is entered: use that as output filename. */
 	outputptr = argc > 2 ? argv[2] : outputname;
