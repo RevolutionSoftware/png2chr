@@ -17,7 +17,7 @@ else ()
     link_libraries (${LIBPNG_LIBRARIES})
 endif ()
 
-set(CMAKE_C_STANDARD 90)
+set(CMAKE_C_STANDARD 99)
 
 add_executable(png2nes
         png2nes.c
